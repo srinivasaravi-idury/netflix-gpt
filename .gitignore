@@ -6,6 +6,7 @@
 .pnp.js
 .firebaserc
 firebase.json
+src\utils\firebase.js
 .firebase
 # testing
 /coverage
