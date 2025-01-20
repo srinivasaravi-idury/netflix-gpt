@@ -6,6 +6,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import {auth} from "../utils/firebase"
+import { useNavigate } from "react-router-dom";
 
 
 const Login = ()=>{
@@ -14,6 +15,7 @@ const Login = ()=>{
   const fullName = useRef();
   const email = useRef();
   const password = useRef();
+  const navigate = useNavigate();
   
   const handleForm = ()=>{
     const message =validation(email.current.value, password.current.value);
@@ -31,6 +33,8 @@ const Login = ()=>{
           // Signed up
           const user = userCredential.user;
           console.log(user);
+          navigate('/browse')
+          
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -49,6 +53,7 @@ const Login = ()=>{
           // Signed in
           const user = userCredential.user;
           console.log(user)
+          navigate("/browse");
           // ...
         })
         .catch((error) => {
