@@ -4,12 +4,16 @@ import Header from "./Header";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import {auth} from "../utils/firebase"
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
 
 
 const Login = ()=>{
+  const dispatch = useDispatch()
   const [isSignInForm,setIsSignInForm] =useState(true)
   const [errorMsg, setErrorMsg] = useState(null);
   const fullName = useRef();
@@ -32,9 +36,20 @@ const Login = ()=>{
         .then((userCredential) => {
           // Signed up
           const user = userCredential.user;
-          console.log(user);
-          navigate('/browse')
-          
+          updateProfile(user, {
+            displayName: fullName.current.value,
+            photoURL: "https://example.com/jane-q-user/profile.jpg",
+          })
+            .then(() => {
+              const { uid, displayName, email } = auth.currentUser;
+              dispatch(
+                addUser({ uid: uid, email: email, displayName: displayName })
+              );
+              navigate("/browse");
+            })
+            .catch((error) => {
+              setErrorMsg(error.message);
+            });          
         })
         .catch((error) => {
           const errorCode = error.code;
