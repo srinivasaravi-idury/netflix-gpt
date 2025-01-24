@@ -1,30 +1,48 @@
-import { signOut } from "firebase/auth";
-import { useSelector } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { AVATAR, LOGO } from "../utils/constants";
 import { auth } from "../utils/firebase";
+import { addUser, removeUser } from "../utils/userSlice";
 
 const Header = () => {
+  const dispatch = useDispatch();
   const navigate =useNavigate();
   const user = useSelector(store=>store.user);
-const handleSignout =()=>{
-  signOut(auth)
-    .then(() => {
-      navigate('/');
-    })
-    .catch((error) => {
-      navigate('/error')
+  const handleSignout =()=>{
+    signOut(auth)
+      .then(() => {
+      })
+      .catch((error) => {
+        navigate('/error')
+      });
+  }
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const { uid, displayName, email } = user;
+        dispatch(addUser({ uid: uid, email: email, displayName: displayName }));
+        navigate('/browse')
+      } else {
+        dispatch(removeUser());
+        navigate('/')
+      }
     });
-}
+    // unsubscribe when component unmounts
+  return () => unsubscribe();
+
+  }, []);
   return (
     <div className="bg-gradient-to-b from-black absolute z-20 w-full flex justify-between">
       <img
         className="w-44"
-        src="https://help.nflxext.com/helpcenter/OneTrust/oneTrust_production/consent/87b6a5c0-0104-4e96-a291-092c11350111/01938dc4-59b3-7bbc-b635-c4131030e85f/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png"
+        src={LOGO}
       />
       {user&&
       <div className="flex p-2 m-2">
         <img
-          src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png"
+          src={AVATAR}
           alt="netflix user"
           className="w-12 h-12"
         />

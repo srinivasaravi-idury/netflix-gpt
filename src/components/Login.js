@@ -7,9 +7,9 @@ import {
   updateProfile,
 } from "firebase/auth";
 import {auth} from "../utils/firebase"
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
+import { BG_URL, USER_PHOTO } from "../utils/constants";
 
 
 const Login = ()=>{
@@ -19,7 +19,6 @@ const Login = ()=>{
   const fullName = useRef();
   const email = useRef();
   const password = useRef();
-  const navigate = useNavigate();
   
   const handleForm = ()=>{
     const message =validation(email.current.value, password.current.value);
@@ -38,14 +37,13 @@ const Login = ()=>{
           const user = userCredential.user;
           updateProfile(user, {
             displayName: fullName.current.value,
-            photoURL: "https://example.com/jane-q-user/profile.jpg",
+            photoURL: USER_PHOTO,
           })
             .then(() => {
               const { uid, displayName, email } = auth.currentUser;
               dispatch(
                 addUser({ uid: uid, email: email, displayName: displayName })
               );
-              navigate("/browse");
             })
             .catch((error) => {
               setErrorMsg(error.message);
@@ -67,8 +65,6 @@ const Login = ()=>{
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
-          console.log(user)
-          navigate("/browse");
           // ...
         })
         .catch((error) => {
@@ -87,7 +83,7 @@ const Login = ()=>{
         <Header />
         <div className="absolute">
           <img
-            src="https://assets.nflxext.com/ffe/siteui/vlv3/2f5a878d-bbce-451b-836a-398227a34fbf/web/IN-en-20241230-TRIFECTA-perspective_5ab944a5-1a71-4f6d-b341-8699d0491edd_small.jpg"
+            src={BG_URL}
             alt="background image"
           />
         </div>
